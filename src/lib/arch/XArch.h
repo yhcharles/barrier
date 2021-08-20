@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <stdexcept>
+
 #include "common/common.h"
 #include "common/stdstring.h"
-#include <stdexcept>
 
 //! Generic thread exception
 /*!
@@ -28,14 +29,14 @@ Exceptions derived from this class are used by the multithreading
 library to perform stack unwinding when a thread terminates.  These
 exceptions must always be rethrown by clients when caught.
 */
-class XThread { };
+class XThread {};
 
 //! Thread exception to cancel
 /*!
 Thrown to cancel a thread.  Clients must not throw this type, but
 must rethrow it if caught (by XThreadCancel, XThread, or ...).
 */
-class XThreadCancel : public XThread { };
+class XThreadCancel : public XThread {};
 
 /*!
 \def RETHROW_XTHREAD
@@ -44,7 +45,12 @@ exceptions.  Put this in your catch (...) handler after necessary
 cleanup but before leaving or returning from the handler.
 */
 #define RETHROW_XTHREAD \
-    try { throw; } catch (XThread&) { throw; } catch (...) { }
+  try {                 \
+    throw;              \
+  } catch (XThread&) {  \
+    throw;              \
+  } catch (...) {       \
+  }
 
 //! Lazy error message string evaluation
 /*!
@@ -54,28 +60,30 @@ type in the c'tor and overriding eval() to return the error
 string for that error code.
 */
 class XArchEval {
-public:
-    XArchEval() { }
-    virtual ~XArchEval() noexcept { }
+ public:
+  XArchEval() {}
+  virtual ~XArchEval() noexcept {}
 
-    virtual std::string    eval() const = 0;
+  virtual std::string eval() const = 0;
 };
 
 //! Generic exception architecture dependent library
 class XArch : public std::runtime_error {
-public:
-    XArch(XArchEval* adopted) : std::runtime_error(adopted->eval()) { delete adopted; }
-    XArch(const std::string& msg) : std::runtime_error(msg) { }
-    virtual ~XArch() noexcept { }
+ public:
+  XArch(XArchEval* adopted) : std::runtime_error(adopted->eval()) {
+    delete adopted;
+  }
+  XArch(const std::string& msg) : std::runtime_error(msg) {}
+  virtual ~XArch() noexcept {}
 };
 
 // Macro to declare XArch derived types
-#define XARCH_SUBCLASS(name_, super_)                                    \
-class name_ : public super_ {                                            \
-public:                                                                    \
-    name_(XArchEval* adoptedEvaluator) : super_(adoptedEvaluator) { }    \
-    name_(const std::string& msg) : super_(msg) { }                        \
-}
+#define XARCH_SUBCLASS(name_, super_)                                \
+  class name_ : public super_ {                                      \
+   public:                                                           \
+    name_(XArchEval* adoptedEvaluator) : super_(adoptedEvaluator) {} \
+    name_(const std::string& msg) : super_(msg) {}                   \
+  }
 
 //! Generic network exception
 /*!

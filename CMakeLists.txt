@@ -339,6 +339,16 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             ${OPENSSL_ROOT}/lib/libssl.a
             ${OPENSSL_ROOT}/lib/libcrypto.a
         )
+    elseif (IS_DIRECTORY /Users/charlieyan/program/homebrew/opt/openssl AND BREW_PROGRAM)  # chy's mac
+        # brew
+        set (OPENSSL_ROOT /Users/charlieyan/program/homebrew/opt/openssl)
+
+        include_directories (BEFORE SYSTEM ${OPENSSL_ROOT}/include)
+
+        set (OPENSSL_LIBS
+            ${OPENSSL_ROOT}/lib/libssl.a
+            ${OPENSSL_ROOT}/lib/libcrypto.a
+        )
     endif()
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")

@@ -17,30 +17,19 @@
  */
 
 #include "barrier/unix/AppUtilUnix.h"
+
 #include "barrier/ArgsBase.h"
 
-AppUtilUnix::AppUtilUnix(IEventQueue* events)
-{
+AppUtilUnix::AppUtilUnix(IEventQueue* events) {}
+
+AppUtilUnix::~AppUtilUnix() {}
+
+int standardStartupStatic(int argc, char** argv) {
+  return AppUtil::instance().app().standardStartup(argc, argv);
 }
 
-AppUtilUnix::~AppUtilUnix()
-{
+int AppUtilUnix::run(int argc, char** argv) {
+  return app().runInner(argc, argv, NULL, &standardStartupStatic);
 }
 
-int
-standardStartupStatic(int argc, char** argv)
-{
-    return AppUtil::instance().app().standardStartup(argc, argv);
-}
-
-int
-AppUtilUnix::run(int argc, char** argv)
-{
-    return app().runInner(argc, argv, NULL, &standardStartupStatic);
-}
-
-void
-AppUtilUnix::startNode()
-{
-    app().startNode();
-}
+void AppUtilUnix::startNode() { app().startNode(); }
